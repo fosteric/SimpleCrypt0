@@ -115,8 +115,8 @@ public class ROT13  {
 
     public void publicPrivateKeyPair() throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         //Create a Key Pair Generator
-        KeyPairGenerator keyGenAlice = KeyPairGenerator.getInstance("DSA","SUN");
-        KeyPairGenerator keyGenBob = KeyPairGenerator.getInstance("DSA", "SUN");
+        KeyPairGenerator keyGenAlice = KeyPairGenerator.getInstance("RSA");
+        KeyPairGenerator keyGenBob = KeyPairGenerator.getInstance("RSA");
 
         //Initialize the Key Pair Generator
         SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
@@ -145,18 +145,16 @@ public class ROT13  {
                 "When in eternal lines to time thou grow’st:\n" +
                 "   So long as men can breathe or eyes can see,\n" +
                 "   So long lives this, and this gives life to thee.\n";
-        Key aesKey = new SecretKeySpec(pubAlice.toString().getBytes(), "AES");
+
+        //encrypt
         Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, privAlice);
+        cipher.init(Cipher.PUBLIC_KEY, pubAlice);
         byte[] encrypted = cipher.doFinal(expected.getBytes());
         String enc = new String(Base64.getEncoder().encodeToString(encrypted));
         System.err.println("Encrypted: " + enc);
-        //During the decryption (Java 8):
 
-        System.out.print("Enter ciphertext: ");
-        encrypted = Base64.getDecoder().decode(enc);
-
-        cipher.init(Cipher.DECRYPT_MODE, aesKey);
+        //decrypt
+        cipher.init(Cipher.PRIVATE_KEY, privAlice);
         String decrypted = new String(cipher.doFinal(encrypted));
         System.err.println("Decrypted: " + decrypted);
     }
